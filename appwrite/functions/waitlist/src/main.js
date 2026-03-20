@@ -1,17 +1,15 @@
 import { Client, Databases, ID, Query } from 'node-appwrite';
+import { Resend } from 'resend';
 
 const APPWRITE_ENDPOINT = process.env.APPWRITE_ENDPOINT;
 const APPWRITE_PROJECT_ID = process.env.APPWRITE_PROJECT_ID;
 const APPWRITE_API_KEY = process.env.APPWRITE_API_KEY;
 const DATABASE_ID = process.env.DATABASE_ID;
-const COLLECTION_WAITLIST = process.env.COLLECTION_WAITLIST;
-const EMAIL_PROVIDER = process.env.EMAIL_PROVIDER ?? 'none';
-const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL ?? '';
-const MAIL_FROM_EMAIL = process.env.MAIL_FROM_EMAIL ?? '';
+const COLLECTION_WAITLIST = process.env.COLLECTION_WAITLIST_ID;
+const RESEND_API_KEY = process.env.RESEND_API_KEY ?? '';
+const MAIL_FROM_EMAIL = process.env.MAIL_FROM_EMAIL ?? 'onboarding@resend.dev';
 const MAIL_FROM_NAME = process.env.MAIL_FROM_NAME ?? 'Selaras';
-const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY ?? '';
-const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY ?? '';
-const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN ?? '';
+const ADMIN_NOTIFICATION_EMAIL = process.env.ADMIN_NOTIFICATION_EMAIL ?? '';
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN ?? '*';
 
 const allowedOrigins = ALLOWED_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean);
@@ -22,7 +20,6 @@ const getCorsOrigin = (req) => {
 	const requestOrigin = req.headers?.origin ?? req.headers?.Origin ?? '';
 	if (allowedOrigins.includes(requestOrigin)) return requestOrigin;
 
-	// Fallback: jika hanya 1 origin di-set, pakai itu langsung
 	return allowedOrigins[0] || '*';
 };
 
@@ -94,84 +91,20 @@ const adminTemplate = ({ email, name, source, createdAt }) => `
 	</div>
 `;
 
-const sendWithSendGrid = async ({ to, subject, html }) => {
-	if (!SENDGRID_API_KEY || !MAIL_FROM_EMAIL) {
-		throw new Error('SENDGRID_API_KEY dan MAIL_FROM_EMAIL wajib diisi.');
-	}
+const sendEmail = async ({ to, subject, html }) => {
+	if (!RESEND_API_KEY) return;
 
-	const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
-		method: 'POST',
-		headers: {
-			Authorization: `Bearer ${SENDGRID_API_KEY}`,
-			'Content-Type': 'application/json'
-		},
-		body: JSON.stringify({
-			from: {
-				email: MAIL_FROM_EMAIL,
-				name: MAIL_FROM_NAME
-			},
-			personalizations: [
-				{
-					to: [{ email: to }]
-				}
-			],
-			subject,
-			content: [
-				{
-					type: 'text/html',
-					value: html
-				}
-			]
-		})
+	const resend = new Resend(RESEND_API_KEY);
+	const { error } = await resend.emails.send({
+		from: `${MAIL_FROM_NAME} <${MAIL_FROM_EMAIL}>`,
+		to,
+		subject,
+		html
 	});
 
-	if (!response.ok) {
-		throw new Error(`SendGrid gagal dengan status ${response.status}.`);
+	if (error) {
+		throw new Error(`Resend error: ${error.message}`);
 	}
-};
-
-const sendWithMailgun = async ({ to, subject, html }) => {
-	if (!MAILGUN_API_KEY || !MAILGUN_DOMAIN || !MAIL_FROM_EMAIL) {
-		throw new Error('MAILGUN_API_KEY, MAILGUN_DOMAIN, dan MAIL_FROM_EMAIL wajib diisi.');
-	}
-
-	const formData = new URLSearchParams();
-	formData.append('from', `${MAIL_FROM_NAME} <${MAIL_FROM_EMAIL}>`);
-	formData.append('to', to);
-	formData.append('subject', subject);
-	formData.append('html', html);
-
-	const token = Buffer.from(`api:${MAILGUN_API_KEY}`).toString('base64');
-	const response = await fetch(`https://api.mailgun.net/v3/${MAILGUN_DOMAIN}/messages`, {
-		method: 'POST',
-		headers: {
-			Authorization: `Basic ${token}`,
-			'Content-Type': 'application/x-www-form-urlencoded'
-		},
-		body: formData.toString()
-	});
-
-	if (!response.ok) {
-		throw new Error(`Mailgun gagal dengan status ${response.status}.`);
-	}
-};
-
-const sendEmail = async (payload) => {
-	if (EMAIL_PROVIDER === 'none') {
-		return;
-	}
-
-	if (EMAIL_PROVIDER === 'sendgrid') {
-		await sendWithSendGrid(payload);
-		return;
-	}
-
-	if (EMAIL_PROVIDER === 'mailgun') {
-		await sendWithMailgun(payload);
-		return;
-	}
-
-	throw new Error(`EMAIL_PROVIDER tidak didukung: ${EMAIL_PROVIDER}`);
 };
 
 export default async ({ req, res, log, error }) => {
@@ -220,7 +153,6 @@ export default async ({ req, res, log, error }) => {
 			email,
 			name,
 			source
-			// $createdAt di-auto-populate oleh Appwrite sebagai system field
 		});
 
 		await sendEmail({
