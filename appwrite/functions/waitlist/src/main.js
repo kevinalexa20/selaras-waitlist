@@ -14,16 +14,34 @@ const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY ?? '';
 const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN ?? '';
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN ?? '*';
 
-const corsHeaders = {
-	'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
+const allowedOrigins = ALLOWED_ORIGIN.split(',').map((o) => o.trim()).filter(Boolean);
+
+const getCorsOrigin = (req) => {
+	if (ALLOWED_ORIGIN === '*') return '*';
+
+	const requestOrigin = req.headers?.origin ?? req.headers?.Origin ?? '';
+	if (allowedOrigins.includes(requestOrigin)) return requestOrigin;
+
+	// Fallback: jika hanya 1 origin di-set, pakai itu langsung
+	return allowedOrigins[0] || '*';
+};
+
+const buildCorsHeaders = (req) => ({
+	'Access-Control-Allow-Origin': getCorsOrigin(req),
 	'Access-Control-Allow-Methods': 'POST, OPTIONS',
 	'Access-Control-Allow-Headers': 'Content-Type'
-};
+});
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const json = (res, payload, statusCode = 200) => {
-	Object.entries(corsHeaders).forEach(([key, value]) => {
+const json = (res, payload, statusCode = 200, req = null) => {
+	const headers = req ? buildCorsHeaders(req) : {
+		'Access-Control-Allow-Origin': allowedOrigins[0] || '*',
+		'Access-Control-Allow-Methods': 'POST, OPTIONS',
+		'Access-Control-Allow-Headers': 'Content-Type'
+	};
+
+	Object.entries(headers).forEach(([key, value]) => {
 		res.setHeader(key, value);
 	});
 
@@ -162,21 +180,21 @@ const sendEmail = async (payload) => {
 
 export default async ({ req, res, log, error }) => {
 	if (req.method === 'OPTIONS') {
-		return json(res, { success: true }, 200);
+		return json(res, { success: true }, 200, req);
 	}
 
 	if (req.method !== 'POST') {
-		return json(res, { success: false, message: 'Method tidak didukung.' }, 405);
+		return json(res, { success: false, message: 'Method tidak didukung.' }, 405, req);
 	}
 
 	if (!APPWRITE_ENDPOINT || !APPWRITE_PROJECT_ID || !APPWRITE_API_KEY) {
 		error('Konfigurasi Appwrite Function belum lengkap.');
-		return json(res, { success: false, message: 'Server belum dikonfigurasi.' }, 500);
+		return json(res, { success: false, message: 'Server belum dikonfigurasi.' }, 500, req);
 	}
 
 	if (!DATABASE_ID || !COLLECTION_WAITLIST) {
 		error('DATABASE_ID atau COLLECTION_WAITLIST belum diisi.');
-		return json(res, { success: false, message: 'Database belum dikonfigurasi.' }, 500);
+		return json(res, { success: false, message: 'Database belum dikonfigurasi.' }, 500, req);
 	}
 
 	const payload = req.bodyJson ?? {};
@@ -185,7 +203,7 @@ export default async ({ req, res, log, error }) => {
 	const source = sanitize(payload.source) || 'direct';
 
 	if (!email || !emailPattern.test(email)) {
-		return json(res, { success: false, message: 'Email tidak valid.' }, 400);
+		return json(res, { success: false, message: 'Email tidak valid.' }, 400, req);
 	}
 
 	try {
@@ -199,7 +217,7 @@ export default async ({ req, res, log, error }) => {
 			return json(res, {
 				success: true,
 				message: 'Email ini sudah terdaftar di waitlist Selaras.'
-			});
+			}, 200, req);
 		}
 
 		await databases.createDocument(DATABASE_ID, COLLECTION_WAITLIST, ID.unique(), {
@@ -228,13 +246,14 @@ export default async ({ req, res, log, error }) => {
 		return json(res, {
 			success: true,
 			message: 'Kamu sudah masuk daftar early access Selaras.'
-		});
+		}, 200, req);
 	} catch (caughtError) {
 		error(caughtError instanceof Error ? caughtError.message : 'Unknown waitlist error');
 		return json(
 			res,
 			{ success: false, message: 'Belum berhasil menyimpan data. Coba lagi beberapa saat lagi.' },
-			500
+			500,
+			req
 		);
 	}
 };
