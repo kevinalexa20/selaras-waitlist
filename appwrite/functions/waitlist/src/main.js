@@ -201,13 +201,11 @@ export default async ({ req, res, log, error }) => {
 			});
 		}
 
-		const createdAt = new Date().toISOString();
-
 		await databases.createDocument(DATABASE_ID, COLLECTION_WAITLIST, ID.unique(), {
 			email,
 			name,
-			source,
-			created_at: createdAt
+			source
+			// $createdAt di-auto-populate oleh Appwrite sebagai system field
 		});
 
 		await sendEmail({
@@ -220,7 +218,7 @@ export default async ({ req, res, log, error }) => {
 			await sendEmail({
 				to: ADMIN_NOTIFICATION_EMAIL,
 				subject: 'Selaras — Waitlist baru masuk',
-				html: adminTemplate({ email, name, source, createdAt })
+				html: adminTemplate({ email, name, source, createdAt: new Date().toISOString() })
 			});
 		}
 
