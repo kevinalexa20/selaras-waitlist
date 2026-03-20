@@ -1,5 +1,9 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import {
+		PUBLIC_WAITLIST_ENDPOINT,
+		PUBLIC_WAITLIST_COUNT
+	} from '$env/static/public';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import HeroSection from '$lib/components/HeroSection.svelte';
 	import ProblemSection from '$lib/components/ProblemSection.svelte';
@@ -14,8 +18,8 @@
 		| { status: 'success'; message: string }
 		| { status: 'error'; message: string };
 
-	const waitlistEndpoint = import.meta.env.PUBLIC_WAITLIST_ENDPOINT?.trim() ?? '';
-	const waitlistCount = import.meta.env.PUBLIC_WAITLIST_COUNT?.trim() ?? '';
+	const waitlistEndpoint = PUBLIC_WAITLIST_ENDPOINT?.trim() ?? '';
+	const waitlistCount = PUBLIC_WAITLIST_COUNT?.trim() ?? '';
 	const waitlistLabel = waitlistCount
 		? `${waitlistCount}+ pasangan sudah antre akses awal`
 		: 'Batch pertama dibuka sangat terbatas';
