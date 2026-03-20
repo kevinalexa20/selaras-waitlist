@@ -41,11 +41,7 @@ const json = (res, payload, statusCode = 200, req = null) => {
 		'Access-Control-Allow-Headers': 'Content-Type'
 	};
 
-	Object.entries(headers).forEach(([key, value]) => {
-		res.setHeader(key, value);
-	});
-
-	return res.json(payload, statusCode);
+	return res.json(payload, statusCode, headers);
 };
 
 const sanitize = (value) => (typeof value === 'string' ? value.trim() : '');
