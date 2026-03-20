@@ -1,4 +1,5 @@
 <script lang="ts">
+	import logoSelaras from '$lib/assets/logo_selaras.png';
 	import { heartIcon, slidersIcon } from '$lib/icons';
 
 	const navLinks = [
@@ -9,7 +10,9 @@
 </script>
 
 <header class="site-header">
-	<a class="brand" href="#top">Selaras</a>
+	<a class="brand" href="#top" aria-label="Selaras">
+		<img src={logoSelaras} alt="" width="1080" height="1080" />
+	</a>
 
 	<div class="header-center">
 		<nav class="primary-nav" aria-label="Navigasi utama">
@@ -42,14 +45,16 @@
 	}
 
 	.brand {
-		font-family: 'Cormorant Garamond', serif;
-		font-size: 1.7rem;
-		font-style: italic;
-		font-weight: 600;
-		letter-spacing: -0.03em;
-		color: var(--accent);
+		display: inline-flex;
+		align-items: center;
 		text-decoration: none;
 		flex-shrink: 0;
+	}
+
+	.brand img {
+		display: block;
+		width: auto;
+		height: 78px;
 	}
 
 	.header-center {
@@ -69,7 +74,7 @@
 		font-size: 0.92rem;
 		font-weight: 500;
 		text-decoration: none;
-		transition: color 160ms ease;
+		transition: color var(--motion-base) var(--ease-out-quart);
 	}
 
 	.primary-nav a:hover {
@@ -92,13 +97,18 @@
 		border: none;
 		box-shadow: 0 4px 12px rgba(179, 94, 64, 0.18);
 		transition:
-			transform 180ms ease,
-			box-shadow 180ms ease;
+			transform var(--motion-base) var(--ease-out-quart),
+			box-shadow var(--motion-base) var(--ease-out-quart);
 	}
 
 	.header-cta:hover {
 		transform: translateY(-1px);
 		box-shadow: 0 6px 16px rgba(179, 94, 64, 0.24);
+	}
+
+	.header-cta:active {
+		transform: translateY(0) scale(0.985);
+		box-shadow: 0 3px 8px rgba(179, 94, 64, 0.16);
 	}
 
 	.header-icons {
@@ -117,8 +127,8 @@
 		color: var(--muted);
 		text-decoration: none;
 		transition:
-			color 160ms ease,
-			transform 180ms ease;
+			color var(--motion-base) var(--ease-out-quart),
+			transform var(--motion-base) var(--ease-out-quart);
 	}
 
 	.icon-link :global(svg) {
@@ -129,6 +139,10 @@
 	.icon-link:hover {
 		color: var(--accent-strong);
 		transform: translateY(-1px);
+	}
+
+	.icon-link:active {
+		transform: translateY(0) scale(0.92);
 	}
 
 	@media (min-width: 860px) {
@@ -157,6 +171,10 @@
 	@media (max-width: 640px) {
 		.site-header {
 			padding: 12px 16px;
+		}
+
+		.brand img {
+			height: 24px;
 		}
 	}
 </style>

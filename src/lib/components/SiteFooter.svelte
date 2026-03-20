@@ -1,7 +1,13 @@
+<script lang="ts">
+	import logoSelaras from '$lib/assets/logo_selaras.png';
+</script>
+
 <footer class="band footer-band">
 	<div class="section-shell site-footer">
 		<div>
-			<a class="brand footer-brand" href="#top">Selaras</a>
+			<a class="brand footer-brand" href="#top" aria-label="Selaras">
+				<img src={logoSelaras} alt="" width="1080" height="1080" />
+			</a>
 			<p>© 2026 Selaras. Ruang bertumbuh bersama.</p>
 		</div>
 
@@ -32,13 +38,15 @@
 	}
 
 	.brand {
-		font-family: 'Cormorant Garamond', serif;
-		font-size: 1.8rem;
-		font-style: italic;
-		font-weight: 600;
-		letter-spacing: -0.03em;
-		color: var(--accent);
+		display: inline-flex;
+		align-items: center;
 		text-decoration: none;
+	}
+
+	.brand img {
+		display: block;
+		width: auto;
+		height: 60px;
 	}
 
 	.footer-brand {
@@ -65,7 +73,7 @@
 		color: var(--muted);
 		font-size: 0.94rem;
 		text-decoration: none;
-		transition: color 160ms ease;
+		transition: color var(--motion-base) var(--ease-out-quart);
 	}
 
 	.footer-nav a:hover {
