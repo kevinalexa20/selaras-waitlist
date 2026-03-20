@@ -50,11 +50,14 @@
 	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
 
+		console.log('[Waitlist] endpoint:', waitlistEndpoint || '(empty)');
+
 		if (!waitlistEndpoint) {
 			waitlistState = {
 				status: 'error',
 				message: 'Form belum aktif. Isi PUBLIC_WAITLIST_ENDPOINT dulu sebelum deploy.'
 			};
+			console.error('[Waitlist] No endpoint configured');
 			return;
 		}
 
@@ -66,25 +69,44 @@
 
 		waitlistState = { status: 'submitting' };
 
+		const requestBody = {
+			email: email.trim(),
+			name: name.trim() || undefined,
+			source
+		};
+
+		console.log('[Waitlist] Sending POST to:', waitlistEndpoint);
+		console.log('[Waitlist] Request body:', JSON.stringify(requestBody));
+
 		try {
 			const response = await fetch(waitlistEndpoint, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({
-					email: email.trim(),
-					name: name.trim() || undefined,
-					source
-				})
+				body: JSON.stringify(requestBody)
 			});
 
-			const payload = (await response.json().catch(() => null)) as
-				| { success?: boolean; message?: string }
-				| null;
+			console.log('[Waitlist] Response status:', response.status, response.statusText);
+			console.log('[Waitlist] Response headers:', Object.fromEntries(response.headers.entries()));
+
+			const rawText = await response.text();
+			console.log('[Waitlist] Raw response body:', rawText);
+
+			let payload: { success?: boolean; message?: string } | null = null;
+			try {
+				payload = JSON.parse(rawText);
+			} catch (parseErr) {
+				console.error('[Waitlist] Failed to parse response as JSON:', parseErr);
+				console.error('[Waitlist] Raw body was:', rawText.slice(0, 500));
+			}
+
+			console.log('[Waitlist] Parsed payload:', payload);
 
 			if (!response.ok || !payload?.success) {
-				throw new Error(payload?.message ?? 'Form belum berhasil dikirim. Coba lagi sebentar.');
+				const errMsg = payload?.message ?? `HTTP ${response.status}: ${rawText.slice(0, 200)}`;
+				console.error('[Waitlist] Request failed:', errMsg);
+				throw new Error(errMsg);
 			}
 
 			waitlistState = {
@@ -95,6 +117,7 @@
 			name = '';
 			email = '';
 		} catch (error) {
+			console.error('[Waitlist] Catch block error:', error);
 			waitlistState = {
 				status: 'error',
 				message:
