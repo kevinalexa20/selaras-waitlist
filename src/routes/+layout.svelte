@@ -49,6 +49,16 @@
 		--success: #2f6f55;
 		--error: #8c3f3b;
 		--shadow: 0 24px 60px rgba(94, 62, 45, 0.08);
+
+		/* Motion tokens */
+		--motion-fast: 140ms;
+		--motion-base: 220ms;
+		--motion-slow: 420ms;
+		--motion-hero: 620ms;
+		--ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1);
+		--ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+		--ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
 		background: var(--bg);
 		color: var(--text);
 	}
@@ -95,5 +105,31 @@
 
 	:global(::selection) {
 		background: rgba(200, 111, 78, 0.18);
+	}
+
+	/* Scroll reveal utility */
+	:global(.reveal) {
+		opacity: 0;
+		transform: translateY(18px);
+		transition:
+			opacity var(--motion-slow) var(--ease-out-quart),
+			transform var(--motion-slow) var(--ease-out-quart);
+	}
+
+	:global(.reveal.is-visible) {
+		opacity: 1;
+		transform: translateY(0);
+	}
+
+	/* Reduced motion */
+	@media (prefers-reduced-motion: reduce) {
+		:global(*),
+		:global(*::before),
+		:global(*::after) {
+			animation-duration: 0.01ms !important;
+			animation-iteration-count: 1 !important;
+			transition-duration: 0.01ms !important;
+			scroll-behavior: auto !important;
+		}
 	}
 </style>
