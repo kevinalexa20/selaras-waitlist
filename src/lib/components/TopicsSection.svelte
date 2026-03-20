@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { walletIcon, familyIcon, valuesIcon, heartIcon } from '$lib/icons';
+	import { reveal } from '$lib/actions/reveal';
 
 	const topicCards = [
 		{ icon: walletIcon, title: 'Keuangan', body: 'Visi finansial & growth map.' },
@@ -12,14 +13,14 @@
 <section class="band band-tint" id="topik">
 	<div class="section-shell">
 		<div class="topics-section">
-			<div class="section-heading">
+			<div class="section-heading" use:reveal>
 				<h2>Eksplorasi Berbagai Dimensi Rasa</h2>
 				<p>150+ pertanyaan yang disiapkan pakar untuk membantu kamu memahami pasangan lebih dalam.</p>
 			</div>
 
 			<div class="topic-grid">
-				{#each topicCards as topic}
-					<article class="topic-card">
+				{#each topicCards as topic, i}
+					<article class="topic-card" use:reveal={{ delay: i * 100 }}>
 						<span class="icon-token topic-icon" aria-hidden="true">{@html topic.icon}</span>
 						<h3>{topic.title}</h3>
 						<p>{topic.body}</p>
@@ -86,6 +87,14 @@
 		border: 1px solid rgba(157, 118, 94, 0.14);
 		border-radius: 24px;
 		box-shadow: 0 18px 34px rgba(110, 74, 52, 0.06);
+		transition:
+			transform var(--motion-base) var(--ease-out-quart),
+			box-shadow var(--motion-base) var(--ease-out-quart);
+	}
+
+	.topic-card:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 22px 40px rgba(110, 74, 52, 0.1);
 	}
 
 	.topic-card h3 {
@@ -109,6 +118,7 @@
 		border-radius: 14px;
 		background: rgba(200, 111, 78, 0.12);
 		color: var(--accent-strong);
+		transition: background-color var(--motion-base) var(--ease-out-quart);
 	}
 
 	.icon-token :global(svg) {
@@ -120,6 +130,10 @@
 		width: 50px;
 		height: 50px;
 		border-radius: 16px;
+	}
+
+	.topic-card:hover .icon-token {
+		background: rgba(200, 111, 78, 0.18);
 	}
 
 	@media (min-width: 860px) {

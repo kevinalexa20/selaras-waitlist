@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { reveal } from '$lib/actions/reveal';
+
 	type WaitlistState =
 		| { status: 'idle' }
 		| { status: 'submitting' }
@@ -24,7 +26,7 @@
 
 <section class="band cta-band" id="waitlist">
 	<div class="section-shell">
-		<div class="cta-panel">
+		<div class="cta-panel" use:reveal>
 			<div class="cta-copy">
 				<h2>Siap bangun fondasi hubungan yang lebih kuat?</h2>
 				<p>
@@ -156,14 +158,16 @@
 		font: inherit;
 		outline: none;
 		transition:
-			border-color 160ms ease,
-			box-shadow 160ms ease;
+			border-color var(--motion-base) var(--ease-out-quart),
+			box-shadow var(--motion-base) var(--ease-out-quart),
+			transform var(--motion-fast) var(--ease-out-quart);
 	}
 
 	input:focus {
 		outline: none;
 		border-color: rgba(255, 239, 231, 0.88);
 		box-shadow: 0 0 0 4px rgba(255, 241, 235, 0.18);
+		transform: translateY(-1px);
 	}
 
 	.form-actions {
@@ -185,11 +189,11 @@
 		font-weight: 600;
 		text-decoration: none;
 		transition:
-			transform 180ms ease,
-			box-shadow 180ms ease,
-			background-color 180ms ease,
-			border-color 180ms ease,
-			opacity 180ms ease;
+			transform var(--motion-base) var(--ease-out-quart),
+			box-shadow var(--motion-base) var(--ease-out-quart),
+			background-color var(--motion-base) var(--ease-out-quart),
+			border-color var(--motion-base) var(--ease-out-quart),
+			opacity var(--motion-base) var(--ease-out-quart);
 	}
 
 	button {
@@ -223,6 +227,11 @@
 		transform: translateY(-1px);
 	}
 
+	button:active,
+	.ghost-button:active {
+		transform: translateY(0) scale(0.985);
+	}
+
 	.microcopy,
 	.feedback {
 		text-align: center;
@@ -232,6 +241,21 @@
 
 	.microcopy {
 		color: rgba(255, 243, 235, 0.78);
+	}
+
+	.feedback {
+		animation: feedback-in var(--motion-slow) var(--ease-out-quart) forwards;
+	}
+
+	@keyframes feedback-in {
+		from {
+			opacity: 0;
+			transform: translateY(8px);
+		}
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
 	}
 
 	.feedback.success {

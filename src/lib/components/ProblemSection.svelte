@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { warningIcon, quoteIcon } from '$lib/icons';
+	import { reveal } from '$lib/actions/reveal';
 
 	const painCards = [
 		{
@@ -16,17 +17,18 @@
 <section class="band band-soft" id="masalah">
 	<div class="section-shell">
 		<div class="problem-section">
-			<div class="section-heading">
+			<div class="section-heading" use:reveal>
 				<h2>"Udah ngerasa cocok, tapi kok pas ngomongin hal serius jadi kaku ya?"</h2>
 				<p>
-					Masih ingat viralnya pasangan yang bikin Google Sheets buat nyatet obrolan serius
-					mereka?
+					Riset menunjukkan lebih dari 60% perceraian di Indonesia dipicu oleh miskomunikasi
+					— bukan perselingkuhan. Masalahnya bukan nggak mau ngobrol, tapi nggak tahu harus
+					mulai dari mana.
 				</p>
 			</div>
 
 			<div class="problem-grid">
-				{#each painCards as card}
-					<article class="note-card">
+				{#each painCards as card, i}
+					<article class="note-card" use:reveal={{ delay: i * 120 }}>
 						<span class="icon-token muted-icon" aria-hidden="true">{@html card.icon}</span>
 						<p>{card.body}</p>
 					</article>
@@ -89,6 +91,9 @@
 		border: 1px solid rgba(157, 118, 94, 0.14);
 		border-radius: 24px;
 		box-shadow: 0 18px 34px rgba(110, 74, 52, 0.06);
+		transition:
+			transform var(--motion-base) var(--ease-out-quart),
+			box-shadow var(--motion-base) var(--ease-out-quart);
 	}
 
 	.note-card p {
@@ -107,6 +112,7 @@
 		border-radius: 14px;
 		background: rgba(200, 111, 78, 0.12);
 		color: var(--accent-strong);
+		transition: background-color var(--motion-base) var(--ease-out-quart);
 	}
 
 	.icon-token :global(svg) {

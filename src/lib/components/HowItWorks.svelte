@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { lockIcon, sparkIcon, penIcon, revealIcon } from '$lib/icons';
+	import { reveal } from '$lib/actions/reveal';
 	import cardWaitlist from '$lib/assets/card-waitlist.png';
 
 	const steps = [
@@ -29,7 +30,7 @@
 <section class="band" id="cara-kerja">
 	<div class="section-shell">
 		<div class="how-section">
-			<div class="section-heading">
+			<div class="section-heading" use:reveal>
 				<h2>Kenalan Ulang Sama Pasangan, Tanpa Drama.</h2>
 				<p>
 					Selaras bukan aplikasi chatting biasa atau tes psikologi yang kaku. Ini cara baru
@@ -39,7 +40,7 @@
 
 			<div class="steps-flow">
 				<!-- Step 1 -->
-				<article class="step-item">
+				<article class="step-item" use:reveal>
 					<span class="step-icon" aria-hidden="true">{@html steps[0].icon}</span>
 					<h3>{steps[0].title}</h3>
 					<p>{steps[0].body}</p>
@@ -48,7 +49,7 @@
 				<span class="dot-separator" aria-hidden="true"></span>
 
 				<!-- Step 2 -->
-				<article class="step-item">
+				<article class="step-item" use:reveal={{ delay: 80 }}>
 					<span class="step-icon" aria-hidden="true">{@html steps[1].icon}</span>
 					<h3>{steps[1].title}</h3>
 					<p>{steps[1].body}</p>
@@ -57,7 +58,7 @@
 				<span class="dot-separator" aria-hidden="true"></span>
 
 				<!-- Preview Panel between step 2 and 3 -->
-				<div class="preview-panel" aria-hidden="true">
+				<div class="preview-panel" aria-hidden="true" use:reveal={{ delay: 160 }}>
 					<div class="preview-shell">
 						<img src={cardWaitlist} alt="Preview kartu pertanyaan Selaras" />
 					</div>
@@ -66,7 +67,7 @@
 				<span class="dot-separator" aria-hidden="true"></span>
 
 				<!-- Step 3 -->
-				<article class="step-item">
+				<article class="step-item" use:reveal={{ delay: 80 }}>
 					<span class="step-icon" aria-hidden="true">{@html steps[2].icon}</span>
 					<h3>{steps[2].title}</h3>
 					<p>{steps[2].body}</p>
@@ -75,7 +76,7 @@
 				<span class="dot-separator" aria-hidden="true"></span>
 
 				<!-- Step 4 -->
-				<article class="step-item">
+				<article class="step-item" use:reveal={{ delay: 160 }}>
 					<span class="step-icon" aria-hidden="true">{@html steps[3].icon}</span>
 					<h3>{steps[3].title}</h3>
 					<p>{steps[3].body}</p>
