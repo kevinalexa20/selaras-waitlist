@@ -14,7 +14,7 @@
 		<div class="topics-section">
 			<div class="section-heading">
 				<h2>Eksplorasi Berbagai Dimensi Rasa</h2>
-				<p>Ribuan pertanyaan yang divalidasi pakar untuk membantu Anda memahami satu sama lain.</p>
+				<p>150+ pertanyaan yang disiapkan pakar untuk membantu kamu memahami pasangan lebih dalam.</p>
 			</div>
 
 			<div class="topic-grid">

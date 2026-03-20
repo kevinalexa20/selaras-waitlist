@@ -2,13 +2,13 @@
 	<div class="section-shell site-footer">
 		<div>
 			<a class="brand footer-brand" href="#top">Selaras</a>
-			<p>(c) 2026 Selaras. Ruang bertumbuh bersama.</p>
+			<p>© 2026 Selaras. Ruang bertumbuh bersama.</p>
 		</div>
 
 		<nav class="footer-nav" aria-label="Navigasi footer">
-			<a href="#top">Tentang</a>
-			<a href="#waitlist">Privasi</a>
-			<a href="#cara-kerja">Panduan</a>
+			<a href="#masalah">Tentang</a>
+			<a href="#cara-kerja">Cara Kerja</a>
+			<a href="#topik">Topik</a>
 		</nav>
 	</div>
 </footer>

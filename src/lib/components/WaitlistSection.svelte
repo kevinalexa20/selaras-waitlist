@@ -61,7 +61,6 @@
 							Masukin Saya ke Waitlist
 						{/if}
 					</button>
-					<a class="ghost-button" href="#cara-kerja">Beri Tahu Saya Saat Rilis ✔</a>
 				</div>
 
 				<p class="microcopy">{waitlistLabel}. Tidak ada spam, hanya kabar penting.</p>

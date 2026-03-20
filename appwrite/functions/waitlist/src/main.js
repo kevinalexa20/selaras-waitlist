@@ -14,7 +14,7 @@ const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY ?? '';
 const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN ?? '';
 
 const corsHeaders = {
-	'Access-Control-Allow-Origin': '*',
+	'Access-Control-Allow-Origin': 'https://selaras.asia',
 	'Access-Control-Allow-Methods': 'POST, OPTIONS',
 	'Access-Control-Allow-Headers': 'Content-Type'
 };
@@ -30,6 +30,14 @@ const json = (res, payload, statusCode = 200) => {
 };
 
 const sanitize = (value) => (typeof value === 'string' ? value.trim() : '');
+
+const escapeHtml = (value) =>
+	String(value)
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#39;');
 
 const createClient = () => {
 	const client = new Client();
@@ -63,10 +71,10 @@ const adminTemplate = ({ email, name, source, createdAt }) => `
 	<div style="font-family: Arial, sans-serif; color: #201915; line-height: 1.6;">
 		<p>Waitlist baru masuk.</p>
 		<ul>
-			<li>Email: ${email}</li>
-			<li>Nama: ${name || '-'}</li>
-			<li>Source: ${source || 'direct'}</li>
-			<li>Waktu: ${createdAt}</li>
+			<li>Email: ${escapeHtml(email)}</li>
+			<li>Nama: ${escapeHtml(name || '-')}</li>
+			<li>Source: ${escapeHtml(source || 'direct')}</li>
+			<li>Waktu: ${escapeHtml(createdAt)}</li>
 		</ul>
 	</div>
 `;

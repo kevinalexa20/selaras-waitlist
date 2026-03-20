@@ -26,20 +26,26 @@
 	let waitlistState = $state<WaitlistState>({ status: 'idle' });
 
 	onMount(() => {
-		const params = new URLSearchParams(window.location.search);
-		const querySource = params.get('utm_source')?.trim();
-		const storedSource = window.localStorage.getItem('selaras_waitlist_source')?.trim();
+		try {
+			const params = new URLSearchParams(window.location.search);
+			const querySource = params.get('utm_source')?.trim();
+			const storedSource = window.localStorage.getItem('selaras_waitlist_source')?.trim();
 
-		if (querySource) {
-			source = querySource;
-			window.localStorage.setItem('selaras_waitlist_source', querySource);
-			return;
-		}
+			if (querySource) {
+				source = querySource;
+				window.localStorage.setItem('selaras_waitlist_source', querySource);
+				return;
+			}
 
-		if (storedSource) {
-			source = storedSource;
+			if (storedSource) {
+				source = storedSource;
+			}
+		} catch {
+			// localStorage tidak tersedia (private browsing / disabled) — lanjut dengan default
 		}
 	});
+
+	const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
@@ -49,6 +55,12 @@
 				status: 'error',
 				message: 'Form belum aktif. Isi PUBLIC_WAITLIST_ENDPOINT dulu sebelum deploy.'
 			};
+			return;
+		}
+
+		const trimmedEmail = email.trim();
+		if (!trimmedEmail || !emailPattern.test(trimmedEmail)) {
+			waitlistState = { status: 'error', message: 'Masukkan alamat email yang valid.' };
 			return;
 		}
 
@@ -105,6 +117,11 @@
 		property="og:description"
 		content="Ruang privat untuk kamu dan pasangan menyamakan visi, satu pertanyaan setiap kalinya."
 	/>
+	<meta property="og:image" content="https://selaras.asia/og-image.png" />
+	<meta property="og:url" content="https://selaras.asia" />
+	<meta property="og:type" content="website" />
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:image" content="https://selaras.asia/og-image.png" />
 </svelte:head>
 
 <main class="landing" id="top">
