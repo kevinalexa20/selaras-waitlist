@@ -12,9 +12,10 @@ const MAIL_FROM_NAME = process.env.MAIL_FROM_NAME ?? 'Selaras';
 const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY ?? '';
 const MAILGUN_API_KEY = process.env.MAILGUN_API_KEY ?? '';
 const MAILGUN_DOMAIN = process.env.MAILGUN_DOMAIN ?? '';
+const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN ?? '*';
 
 const corsHeaders = {
-	'Access-Control-Allow-Origin': 'https://selaras.asia',
+	'Access-Control-Allow-Origin': ALLOWED_ORIGIN,
 	'Access-Control-Allow-Methods': 'POST, OPTIONS',
 	'Access-Control-Allow-Headers': 'Content-Type'
 };
