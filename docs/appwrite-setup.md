@@ -1,5 +1,7 @@
 # Appwrite Setup untuk Selaras Waitlist
 
+> Terakhir diperbarui: 22 Maret 2026
+
 Dokumen ini menjelaskan setup minimum supaya landing page `selaras-waitlist` bisa menerima signup end-to-end.
 
 ## 1. Site
@@ -64,24 +66,24 @@ Folder function ada di `appwrite/functions/waitlist`.
 | `APPWRITE_API_KEY` | yes | API key dengan akses databases |
 | `DATABASE_ID` | yes | database untuk collection waitlist |
 | `COLLECTION_WAITLIST` | yes | ID collection waitlist |
-| `EMAIL_PROVIDER` | no | `sendgrid`, `mailgun`, atau `none` |
-| `MAIL_FROM_EMAIL` | jika email aktif | alamat pengirim |
-| `MAIL_FROM_NAME` | no | default `Selaras` |
+| `RESEND_API_KEY` | yes (untuk email) | API key dari [Resend](https://resend.com) |
+| `MAIL_FROM_EMAIL` | no | alamat pengirim, default `onboarding@resend.dev` |
+| `MAIL_FROM_NAME` | no | nama pengirim, default `Selaras` |
 | `ADMIN_NOTIFICATION_EMAIL` | no | email admin untuk notif signup baru |
-| `SENDGRID_API_KEY` | jika pakai SendGrid | API key SendGrid |
-| `MAILGUN_API_KEY` | jika pakai Mailgun | API key Mailgun |
-| `MAILGUN_DOMAIN` | jika pakai Mailgun | domain Mailgun |
+| `ALLOWED_ORIGIN` | no | CORS whitelist, comma-separated, default `*` |
+| `SITE_URL` | no | URL site untuk link di email, default `https://selaras.asia` |
 
 ## 4. Catatan penting tentang email
 
-Issue awal menyebut Appwrite Messaging. Untuk waitlist anonim, Appwrite Messaging kurang pas karena email target umumnya terikat ke user Appwrite.
+Function ini menggunakan [Resend](https://resend.com) sebagai email provider karena API-nya simpel dan developer-friendly.
 
-Supaya tetap sederhana, function ini:
+Cara kerja:
 
-- menyimpan data signup ke Appwrite Databases
-- mengirim email langsung ke SendGrid atau Mailgun via HTTP API
+- Menyimpan data signup ke Appwrite Databases
+- Mengirim email konfirmasi ke user via Resend API
+- Mengirim notifikasi ke admin (jika `ADMIN_NOTIFICATION_EMAIL` diisi)
 
-Kalau nanti Anda tetap ingin memaksa Appwrite Messaging, Anda perlu menambah layer pembuatan user/target email terlebih dulu. Untuk MVP waitlist, itu tidak perlu.
+Jika `RESEND_API_KEY` tidak diisi, signup tetap tersimpan ke database tapi email tidak terkirim.
 
 ## 5. Domain
 
