@@ -38,7 +38,10 @@ export const initAnalytics = (apiKey: string, apiHost: string) => {
 			defaults: '2026-01-30',
 			capture_pageview: false,
 			capture_pageleave: true,
-			autocapture: true,
+			autocapture: false,
+			disable_session_recording: true,
+			disable_surveys: true,
+			advanced_disable_flags: true,
 			persistence: 'localStorage+cookie'
 		});
 
