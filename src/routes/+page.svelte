@@ -1,6 +1,16 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { env } from '$env/dynamic/public';
+	import {
+		capturePageView,
+		getUtmSource,
+		identifyUser,
+		initAnalytics,
+		trackWaitlistFailed,
+		trackWaitlistSubmitted,
+		trackWaitlistSucceeded,
+		type FailReason
+	} from '$lib/analytics';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import HeroSection from '$lib/components/HeroSection.svelte';
 	import ProblemSection from '$lib/components/ProblemSection.svelte';
@@ -17,6 +27,8 @@
 
 	const waitlistEndpoint = env.PUBLIC_WAITLIST_ENDPOINT?.trim() ?? '';
 	const waitlistCount = env.PUBLIC_WAITLIST_COUNT?.trim() ?? '';
+	const posthogKey = env.PUBLIC_POSTHOG_KEY?.trim() ?? '';
+	const posthogHost = env.PUBLIC_POSTHOG_HOST?.trim() || 'https://us.i.posthog.com';
 	const waitlistLabel = waitlistCount
 		? `${waitlistCount}+ pasangan sudah antre akses awal`
 		: 'Batch pertama dibuka sangat terbatas';
@@ -27,23 +39,9 @@
 	let waitlistState = $state<WaitlistState>({ status: 'idle' });
 
 	onMount(() => {
-		try {
-			const params = new URLSearchParams(window.location.search);
-			const querySource = params.get('utm_source')?.trim();
-			const storedSource = window.localStorage.getItem('selaras_waitlist_source')?.trim();
-
-			if (querySource) {
-				source = querySource;
-				window.localStorage.setItem('selaras_waitlist_source', querySource);
-				return;
-			}
-
-			if (storedSource) {
-				source = storedSource;
-			}
-		} catch {
-			// localStorage tidak tersedia (private browsing / disabled) — lanjut dengan default
-		}
+		source = getUtmSource();
+		initAnalytics(posthogKey, posthogHost);
+		capturePageView();
 	});
 
 	const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -51,19 +49,23 @@
 	async function handleSubmit(event: SubmitEvent) {
 		event.preventDefault();
 
-		console.log('[Waitlist] endpoint:', waitlistEndpoint || '(empty)');
+		const trimmedName = name.trim();
+		const trimmedEmail = email.trim();
+		const hasName = Boolean(trimmedName);
+
+		trackWaitlistSubmitted({ source, has_name: hasName });
 
 		if (!waitlistEndpoint) {
+			trackWaitlistFailed({ source, has_name: hasName, reason: 'missing_endpoint' });
 			waitlistState = {
 				status: 'error',
 				message: 'Form belum aktif. Isi PUBLIC_WAITLIST_ENDPOINT dulu sebelum deploy.'
 			};
-			console.error('[Waitlist] No endpoint configured');
 			return;
 		}
 
-		const trimmedEmail = email.trim();
 		if (!trimmedEmail || !emailPattern.test(trimmedEmail)) {
+			trackWaitlistFailed({ source, has_name: hasName, reason: 'invalid_email' });
 			waitlistState = { status: 'error', message: 'Masukkan alamat email yang valid.' };
 			return;
 		}
@@ -71,13 +73,10 @@
 		waitlistState = { status: 'submitting' };
 
 		const requestBody = {
-			email: email.trim(),
-			name: name.trim() || undefined,
+			email: trimmedEmail,
+			name: trimmedName || undefined,
 			source
 		};
-
-		console.log('[Waitlist] Sending POST to:', waitlistEndpoint);
-		console.log('[Waitlist] Request body:', JSON.stringify(requestBody));
 
 		try {
 			const response = await fetch(waitlistEndpoint, {
@@ -88,25 +87,17 @@
 				body: JSON.stringify(requestBody)
 			});
 
-			console.log('[Waitlist] Response status:', response.status, response.statusText);
-			console.log('[Waitlist] Response headers:', Object.fromEntries(response.headers.entries()));
-
 			const rawText = await response.text();
-			console.log('[Waitlist] Raw response body:', rawText);
 
 			let payload: { success?: boolean; message?: string } | null = null;
 			try {
 				payload = JSON.parse(rawText);
-			} catch (parseErr) {
-				console.error('[Waitlist] Failed to parse response as JSON:', parseErr);
-				console.error('[Waitlist] Raw body was:', rawText.slice(0, 500));
+			} catch {
+				payload = null;
 			}
-
-			console.log('[Waitlist] Parsed payload:', payload);
 
 			if (!response.ok || !payload?.success) {
 				const errMsg = payload?.message ?? `HTTP ${response.status}: ${rawText.slice(0, 200)}`;
-				console.error('[Waitlist] Request failed:', errMsg);
 				throw new Error(errMsg);
 			}
 
@@ -115,10 +106,27 @@
 				message: payload.message ?? 'Kamu sudah masuk daftar early access Selaras.'
 			};
 
+			trackWaitlistSucceeded({ source, has_name: hasName });
+			identifyUser(
+				trimmedEmail,
+				{
+					email: trimmedEmail,
+					name: trimmedName || null,
+					signup_source: source
+				},
+				{
+					signup_source: source,
+					signup_date: new Date().toISOString()
+				}
+			);
+
 			name = '';
 			email = '';
 		} catch (error) {
-			console.error('[Waitlist] Catch block error:', error);
+			const reason: FailReason =
+				error instanceof TypeError ? 'network_error' : error instanceof Error ? 'api_error' : 'unknown';
+
+			trackWaitlistFailed({ source, has_name: hasName, reason });
 			waitlistState = {
 				status: 'error',
 				message:
