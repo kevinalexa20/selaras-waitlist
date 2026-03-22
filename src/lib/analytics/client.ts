@@ -1,39 +1,63 @@
-import posthog from 'posthog-js';
-
 import type { UserIdentifySetOnceProps, UserIdentifySetProps } from './types';
 import { getAttributionProperties, registerGlobalProperties } from './properties';
 
 let isReady = false;
 let pageLoadStartedAt = 0;
+let posthogClient: {
+	init: (apiKey: string, options: Record<string, unknown>) => void;
+	capture: (eventName: string, properties?: object) => void;
+	identify: (
+		distinctId: string,
+		setProps: UserIdentifySetProps,
+		setOnceProps: UserIdentifySetOnceProps
+	) => void;
+	register: (properties: Record<string, unknown>) => void;
+	register_once: (properties: Record<string, unknown>) => void;
+} | null = null;
+let initPromise: Promise<void> | null = null;
 
 export const initAnalytics = (apiKey: string, apiHost: string) => {
 	if (typeof window === 'undefined') {
-		return;
+		return Promise.resolve();
 	}
 
 	if (!apiKey || isReady) {
-		return;
+		return Promise.resolve();
 	}
 
-	posthog.init(apiKey, {
-		api_host: apiHost,
-		capture_pageview: false,
-		capture_pageleave: true,
-		autocapture: true,
-		persistence: 'localStorage+cookie'
+	if (initPromise) {
+		return initPromise;
+	}
+
+	initPromise = (async () => {
+		const posthogModule = await import('posthog-js');
+		posthogClient = posthogModule.default;
+
+		posthogClient.init(apiKey, {
+			api_host: apiHost,
+			defaults: '2026-01-30',
+			capture_pageview: false,
+			capture_pageleave: true,
+			autocapture: true,
+			persistence: 'localStorage+cookie'
+		});
+
+		isReady = true;
+		pageLoadStartedAt = Date.now();
+		registerGlobalProperties(posthogClient);
+	})().finally(() => {
+		initPromise = null;
 	});
 
-	isReady = true;
-	pageLoadStartedAt = Date.now();
-	registerGlobalProperties();
+	return initPromise;
 };
 
 export const capture = (eventName: string, properties?: object) => {
-	if (!isReady) {
+	if (!isReady || !posthogClient) {
 		return;
 	}
 
-	posthog.capture(eventName, properties);
+	posthogClient.capture(eventName, properties);
 };
 
 export const identifyUser = (
@@ -41,11 +65,11 @@ export const identifyUser = (
 	setProps: UserIdentifySetProps,
 	setOnceProps: UserIdentifySetOnceProps
 ) => {
-	if (!isReady || !distinctId) {
+	if (!isReady || !distinctId || !posthogClient) {
 		return;
 	}
 
-	posthog.identify(distinctId, setProps, setOnceProps);
+	posthogClient.identify(distinctId, setProps, setOnceProps);
 };
 
 export const capturePageView = () => {

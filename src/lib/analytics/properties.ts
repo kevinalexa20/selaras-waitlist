@@ -1,6 +1,9 @@
-import posthog from 'posthog-js';
-
 import type { DeviceType } from './types';
+
+type PostHogRegisterClient = {
+	register_once: (properties: Record<string, unknown>) => void;
+	register: (properties: Record<string, unknown>) => void;
+};
 
 const WAITLIST_SOURCE_KEY = 'selaras_waitlist_source';
 
@@ -84,7 +87,7 @@ export const getAttributionProperties = () => {
 	};
 };
 
-export const registerGlobalProperties = () => {
+export const registerGlobalProperties = (posthog: PostHogRegisterClient) => {
 	if (typeof window === 'undefined') {
 		return;
 	}
