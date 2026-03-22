@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { walletIcon, familyIcon, valuesIcon, heartIcon } from '$lib/icons';
 	import { reveal } from '$lib/actions/reveal';
+	import { trackSection } from '$lib/analytics/actions/trackSection';
 
 	const topicCards = [
 		{ icon: walletIcon, title: 'Keuangan', body: 'Visi finansial & growth map.' },
@@ -10,7 +11,7 @@
 	] as const;
 </script>
 
-<section class="band band-tint" id="topik">
+<section class="band band-tint" id="topik" use:trackSection={{ sectionId: 'topik', sectionIndex: 2 }}>
 	<div class="section-shell">
 		<div class="topics-section">
 			<div class="section-heading" use:reveal>

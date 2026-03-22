@@ -1,6 +1,7 @@
 <script lang="ts">
 	import logoSelaras from '$lib/assets/logo_selaras.png';
 	import { heartIcon, slidersIcon } from '$lib/icons';
+	import { trackCta } from '$lib/analytics/actions/trackCta';
 
 	const navLinks = [
 		{ label: 'Masalah', href: '#masalah' },
@@ -21,7 +22,7 @@
 			{/each}
 		</nav>
 
-		<a class="header-cta" href="#waitlist">Amankan Akses Awal</a>
+		<a class="header-cta" href="#waitlist" use:trackCta={{ ctaId: 'header_cta' }}>Amankan Akses Awal</a>
 	</div>
 
 	<div class="header-icons">

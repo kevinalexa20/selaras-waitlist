@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { lockIcon, sparkIcon, penIcon, revealIcon } from '$lib/icons';
 	import { reveal } from '$lib/actions/reveal';
+	import { trackSection } from '$lib/analytics/actions/trackSection';
 	import cardWaitlist from '$lib/assets/card-waitlist.png';
 
 	const steps = [
@@ -27,7 +28,7 @@
 	] as const;
 </script>
 
-<section class="band" id="cara-kerja">
+<section class="band" id="cara-kerja" use:trackSection={{ sectionId: 'cara-kerja', sectionIndex: 1 }}>
 	<div class="section-shell">
 		<div class="how-section">
 			<div class="section-heading" use:reveal>

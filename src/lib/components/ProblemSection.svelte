@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { warningIcon, quoteIcon } from '$lib/icons';
 	import { reveal } from '$lib/actions/reveal';
+	import { trackSection } from '$lib/analytics/actions/trackSection';
 
 	const painCards = [
 		{
@@ -14,7 +15,7 @@
 	] as const;
 </script>
 
-<section class="band band-soft" id="masalah">
+<section class="band band-soft" id="masalah" use:trackSection={{ sectionId: 'masalah', sectionIndex: 0 }}>
 	<div class="section-shell">
 		<div class="problem-section">
 			<div class="section-heading" use:reveal>

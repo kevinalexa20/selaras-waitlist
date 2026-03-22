@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { reveal } from '$lib/actions/reveal';
+	import { trackForm } from '$lib/analytics/actions/trackForm';
+	import { trackSection } from '$lib/analytics/actions/trackSection';
 
 	type WaitlistState =
 		| { status: 'idle' }
@@ -24,7 +26,7 @@
 	} = $props();
 </script>
 
-<section class="band cta-band" id="waitlist">
+<section class="band cta-band" id="waitlist" use:trackSection={{ sectionId: 'waitlist', sectionIndex: 3 }}>
 	<div class="section-shell">
 		<div class="cta-panel" use:reveal>
 			<div class="cta-copy">
@@ -35,7 +37,7 @@
 				</p>
 			</div>
 
-			<form class="waitlist-form" {onsubmit} novalidate>
+			<form class="waitlist-form" {onsubmit} novalidate use:trackForm>
 				<div class="field-grid">
 					<label>
 						<span>Nama</span>
