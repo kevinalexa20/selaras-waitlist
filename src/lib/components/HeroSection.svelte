@@ -1,6 +1,6 @@
 <script lang="ts">
 import heroImage from '$lib/assets/asset-1.png';
-import { trackCta } from '$lib/analytics/actions/trackCta';
+import { trackCta } from '$lib/ph/actions/trackCta';
 
 let { waitlistLabel }: { waitlistLabel: string } = $props();
 </script>
@@ -225,3 +225,5 @@ padding: 14px;
 }
 }
 </style>
+
+

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { warningIcon, quoteIcon } from '$lib/icons';
 	import { reveal } from '$lib/actions/reveal';
-	import { trackSection } from '$lib/analytics/actions/trackSection';
+	import { trackSection } from '$lib/ph/actions/trackSection';
 
 	const painCards = [
 		{
@@ -141,3 +141,5 @@
 		}
 	}
 </style>
+
+

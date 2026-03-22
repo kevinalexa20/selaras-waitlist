@@ -10,7 +10,7 @@
 		trackWaitlistSubmitted,
 		trackWaitlistSucceeded,
 		type FailReason
-	} from '$lib/analytics';
+	} from '$lib/ph';
 	import SiteHeader from '$lib/components/SiteHeader.svelte';
 	import HeroSection from '$lib/components/HeroSection.svelte';
 	import ProblemSection from '$lib/components/ProblemSection.svelte';
@@ -40,8 +40,9 @@
 
 	onMount(() => {
 		source = getUtmSource();
-		initAnalytics(posthogKey, posthogHost);
-		capturePageView();
+		void initAnalytics(posthogKey, posthogHost).then(() => {
+			capturePageView();
+		});
 	});
 
 	const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -197,3 +198,5 @@
 		}
 	}
 </style>
+
+

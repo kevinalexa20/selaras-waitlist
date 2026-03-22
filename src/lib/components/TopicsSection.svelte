@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { walletIcon, familyIcon, valuesIcon, heartIcon } from '$lib/icons';
 	import { reveal } from '$lib/actions/reveal';
-	import { trackSection } from '$lib/analytics/actions/trackSection';
+	import { trackSection } from '$lib/ph/actions/trackSection';
 
 	const topicCards = [
 		{ icon: walletIcon, title: 'Keuangan', body: 'Visi finansial & growth map.' },
@@ -159,3 +159,5 @@
 		}
 	}
 </style>
+
+

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import logoSelaras from '$lib/assets/logo_selaras.png';
 	import { heartIcon, slidersIcon } from '$lib/icons';
-	import { trackCta } from '$lib/analytics/actions/trackCta';
+	import { trackCta } from '$lib/ph/actions/trackCta';
 
 	const navLinks = [
 		{ label: 'Masalah', href: '#masalah' },
@@ -179,3 +179,5 @@
 		}
 	}
 </style>
+
+

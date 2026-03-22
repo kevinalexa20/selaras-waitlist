@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { lockIcon, sparkIcon, penIcon, revealIcon } from '$lib/icons';
 	import { reveal } from '$lib/actions/reveal';
-	import { trackSection } from '$lib/analytics/actions/trackSection';
+	import { trackSection } from '$lib/ph/actions/trackSection';
 	import cardWaitlist from '$lib/assets/card-waitlist.png';
 
 	const steps = [
@@ -216,3 +216,5 @@
 		}
 	}
 </style>
+
+

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { reveal } from '$lib/actions/reveal';
-	import { trackForm } from '$lib/analytics/actions/trackForm';
-	import { trackSection } from '$lib/analytics/actions/trackSection';
+	import { trackForm } from '$lib/ph/actions/trackForm';
+	import { trackSection } from '$lib/ph/actions/trackSection';
 
 	type WaitlistState =
 		| { status: 'idle' }
@@ -288,3 +288,5 @@
 		}
 	}
 </style>
+
+
