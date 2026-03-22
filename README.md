@@ -25,6 +25,8 @@ PUBLIC_WAITLIST_ENDPOINT=
 PUBLIC_WAITLIST_COUNT=
 PUBLIC_PLAUSIBLE_DOMAIN=
 PUBLIC_GA_MEASUREMENT_ID=
+PUBLIC_POSTHOG_KEY=
+PUBLIC_POSTHOG_HOST=https://us.i.posthog.com
 ```
 
 Keterangan:
@@ -33,6 +35,8 @@ Keterangan:
 - `PUBLIC_WAITLIST_COUNT`: angka opsional untuk social proof
 - `PUBLIC_PLAUSIBLE_DOMAIN`: domain Plausible opsional
 - `PUBLIC_GA_MEASUREMENT_ID`: measurement ID GA4 opsional
+- `PUBLIC_POSTHOG_KEY`: project API key PostHog (opsional)
+- `PUBLIC_POSTHOG_HOST`: host ingestion PostHog (default `https://us.i.posthog.com`)
 
 ## Build
 
