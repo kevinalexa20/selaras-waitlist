@@ -1,5 +1,6 @@
-import { getTimeSinceLoadMs, trackFormFieldFocused, trackFormStarted } from '$lib/analytics';
-import type { FormFieldName } from '$lib/analytics';
+import { getTimeSinceLoadMs } from '../client';
+import { trackFormFieldFocused, trackFormStarted } from '../events';
+import type { FormFieldName } from '../types';
 
 const isTrackedField = (value: string): value is FormFieldName => {
 	return value === 'name' || value === 'email';

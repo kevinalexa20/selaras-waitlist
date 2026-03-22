@@ -1,4 +1,6 @@
-import { getTimeSinceLoadMs, trackSectionViewed, type SectionId } from '$lib/analytics';
+import { getTimeSinceLoadMs } from '../client';
+import { trackSectionViewed } from '../events';
+import type { SectionId } from '../types';
 
 type TrackSectionParams = {
 	sectionId: SectionId;

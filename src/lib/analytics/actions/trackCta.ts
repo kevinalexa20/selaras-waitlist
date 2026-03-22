@@ -1,4 +1,5 @@
-import { trackCtaClicked, type CtaId } from '$lib/analytics';
+import { trackCtaClicked } from '../events';
+import type { CtaId } from '../types';
 
 type TrackCtaParams = {
 	ctaId: CtaId;
